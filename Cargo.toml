@@ -1,0 +1,9 @@
+[package]
+name = "advent-of-code-2022"
+version = "0.1.0"
+authors = ["Andreas Neuhaus <zargony@zargony.com>"]
+description = "Solutions to the Advent of Code 2022 puzzles"
+edition = "2021"
+
+[dependencies]
+itertools = "0.10"
