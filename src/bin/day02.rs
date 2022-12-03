@@ -1,8 +1,6 @@
 use advent_of_code_2022::Input;
 use itertools::Itertools;
-use std::cmp::Ordering;
-use std::error;
-use std::str::FromStr;
+use std::{cmp::Ordering, error, str::FromStr};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -141,7 +139,7 @@ impl Round {
 }
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    let rounds: Vec<Round> = Input::day(2)?.parsed_lines().try_collect().unwrap();
+    let rounds: Vec<Round> = Input::day(2)?.parsed_lines().try_collect()?;
 
     let score_stupid: u32 = rounds.iter().map(Round::score_stupid).sum();
     println!("Total score (stupid): {}", score_stupid);

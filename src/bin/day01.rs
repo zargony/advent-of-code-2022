@@ -1,7 +1,9 @@
 use advent_of_code_2022::Input;
 use itertools::Itertools;
-use std::error;
-use std::io::{self, Read};
+use std::{
+    error,
+    io::{self, Read},
+};
 
 fn parse<R: Read>(input: Input<R>) -> io::Result<Vec<Vec<u32>>> {
     input.parsed_blocks().try_collect()
