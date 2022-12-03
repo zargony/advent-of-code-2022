@@ -60,13 +60,21 @@ impl<R: Read> Input<R> {
         self.reader.lines()
     }
 
+    /// Iterator over converted lines of this input
+    pub fn lines_into<T>(self) -> impl Iterator<Item = io::Result<T>>
+    where
+        T: From<String>,
+    {
+        self.lines().map(|line| line.map(Into::into))
+    }
+
     /// Iterator over parsed lines of this input
-    pub fn parsed_lines<T>(self) -> impl Iterator<Item = io::Result<T>>
+    pub fn lines_parse<T>(self) -> impl Iterator<Item = io::Result<T>>
     where
         T: FromStr,
         T::Err: error::Error + Send + Sync + 'static,
     {
-        self.reader.lines().map(|line| {
+        self.lines().map(|line| {
             line.and_then(|s| {
                 s.parse()
                     .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
@@ -74,17 +82,8 @@ impl<R: Read> Input<R> {
         })
     }
 
-    /// Iterator over blocks of this input
+    /// Iterator over blocks of lines of this input
     pub fn blocks(self) -> impl Iterator<Item = io::Result<Vec<String>>> {
-        self.parsed_blocks()
-    }
-
-    /// Iterator over parsed blocks of this input
-    pub fn parsed_blocks<T>(self) -> impl Iterator<Item = io::Result<Vec<T>>>
-    where
-        T: FromStr,
-        T::Err: error::Error + Send + Sync + 'static,
-    {
         fn is_blank_line(line: &io::Result<String>) -> bool {
             line.as_ref().map(|s| s.trim().is_empty()).unwrap_or(false)
         }
@@ -96,17 +95,38 @@ impl<R: Read> Input<R> {
             let block: io::Result<Vec<_>> = lines
                 .skip_while(is_blank_line)
                 .take_while(is_not_blank_line)
-                .map(|line| {
-                    line.and_then(|s| {
-                        s.parse()
-                            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
-                    })
-                })
                 .try_collect();
             match block {
                 Ok(ref lines) if !lines.is_empty() => Some(block),
                 _ => None,
             }
+        })
+    }
+
+    /// Iterator over blocks of converted lines of this input
+    pub fn blocks_into<T>(self) -> impl Iterator<Item = io::Result<Vec<T>>>
+    where
+        T: From<String>,
+    {
+        self.blocks()
+            .map(|block| block.map(|b| b.into_iter().map(Into::into).collect()))
+    }
+
+    /// Iterator over blocks of parsed lines of this input
+    pub fn blocks_parse<T>(self) -> impl Iterator<Item = io::Result<Vec<T>>>
+    where
+        T: FromStr,
+        T::Err: error::Error + Send + Sync + 'static,
+    {
+        self.blocks().map(|block| {
+            block.and_then(|b| {
+                b.into_iter()
+                    .map(|line| {
+                        line.parse()
+                            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))
+                    })
+                    .try_collect()
+            })
         })
     }
 }
@@ -117,6 +137,21 @@ mod tests {
 
     const INPUT_NUMBERS: &str = "11\n22\n33\n44\n55\n";
     const INPUT_BLOCKS: &str = "11\n22\n\n33\n44\n\n55\n66\n";
+
+    #[derive(Debug)]
+    struct TestItem(String);
+
+    impl From<String> for TestItem {
+        fn from(s: String) -> Self {
+            Self(s)
+        }
+    }
+
+    impl PartialEq<&str> for TestItem {
+        fn eq(&self, other: &&str) -> bool {
+            self.0 == *other
+        }
+    }
 
     #[test]
     fn day_one() {
@@ -131,12 +166,21 @@ mod tests {
     }
 
     #[test]
-    fn parsed_lines() {
-        let lines: Vec<u32> = Input::from(INPUT_NUMBERS)
-            .parsed_lines()
+    fn lines_into() {
+        let items: Vec<TestItem> = Input::from(INPUT_NUMBERS)
+            .lines_into()
             .try_collect()
             .unwrap();
-        assert_eq!(lines, [11, 22, 33, 44, 55]);
+        assert_eq!(items, ["11", "22", "33", "44", "55"]);
+    }
+
+    #[test]
+    fn lines_parse() {
+        let items: Vec<u32> = Input::from(INPUT_NUMBERS)
+            .lines_parse()
+            .try_collect()
+            .unwrap();
+        assert_eq!(items, [11, 22, 33, 44, 55]);
     }
 
     #[test]
@@ -146,9 +190,18 @@ mod tests {
     }
 
     #[test]
-    fn parsed_blocks() {
+    fn blocks_into() {
+        let blocks: Vec<Vec<TestItem>> = Input::from(INPUT_BLOCKS)
+            .blocks_into()
+            .try_collect()
+            .unwrap();
+        assert_eq!(blocks, [["11", "22"], ["33", "44"], ["55", "66"]]);
+    }
+
+    #[test]
+    fn blocks_parse() {
         let blocks: Vec<Vec<u32>> = Input::from(INPUT_BLOCKS)
-            .parsed_blocks()
+            .blocks_parse()
             .try_collect()
             .unwrap();
         assert_eq!(blocks, [[11, 22], [33, 44], [55, 66]]);

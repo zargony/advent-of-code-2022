@@ -6,7 +6,7 @@ use std::{
 };
 
 fn parse<R: Read>(input: Input<R>) -> io::Result<Vec<Vec<u32>>> {
-    input.parsed_blocks().try_collect()
+    input.blocks_parse().try_collect()
 }
 
 fn max_calories<C: AsRef<[u32]>>(calories: &[C]) -> u32 {

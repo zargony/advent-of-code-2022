@@ -139,7 +139,7 @@ impl Round {
 }
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    let rounds: Vec<Round> = Input::day(2)?.parsed_lines().try_collect()?;
+    let rounds: Vec<Round> = Input::day(2)?.lines_parse().try_collect()?;
 
     let score_stupid: u32 = rounds.iter().map(Round::score_stupid).sum();
     println!("Total score (stupid): {}", score_stupid);
@@ -158,14 +158,14 @@ mod tests {
 
     #[test]
     fn part_1() {
-        let rounds: Vec<Round> = Input::from(INPUT).parsed_lines().try_collect().unwrap();
+        let rounds: Vec<Round> = Input::from(INPUT).lines_parse().try_collect().unwrap();
         let scores: Vec<_> = rounds.iter().map(Round::score_stupid).collect();
         assert_eq!(scores, [8, 1, 6]);
     }
 
     #[test]
     fn part_2() {
-        let rounds: Vec<Round> = Input::from(INPUT).parsed_lines().try_collect().unwrap();
+        let rounds: Vec<Round> = Input::from(INPUT).lines_parse().try_collect().unwrap();
         let scores: Vec<_> = rounds.iter().map(Round::score_smart).collect();
         assert_eq!(scores, [4, 1, 7]);
     }
