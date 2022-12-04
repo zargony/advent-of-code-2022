@@ -63,7 +63,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw\n";
+    fn rucksacks() -> Vec<Rucksack> {
+        const INPUT: &str = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw\n";
+        Input::from(INPUT).lines_into().try_collect().unwrap()
+    }
 
     #[test]
     fn item_priorities() {
@@ -77,8 +80,7 @@ mod tests {
 
     #[test]
     fn part_1() {
-        let rucksacks: Vec<Rucksack> = Input::from(INPUT).lines_into().try_collect().unwrap();
-        let priorities: Vec<_> = rucksacks
+        let priorities: Vec<_> = rucksacks()
             .iter()
             .map(Rucksack::common_item_priority)
             .collect();
@@ -87,8 +89,10 @@ mod tests {
 
     #[test]
     fn part_2() {
-        let rucksacks: Vec<Rucksack> = Input::from(INPUT).lines_into().try_collect().unwrap();
-        let priorities: Vec<_> = rucksacks.chunks(3).map(find_badge_item_priority).collect();
+        let priorities: Vec<_> = rucksacks()
+            .chunks(3)
+            .map(find_badge_item_priority)
+            .collect();
         assert_eq!(priorities, [18, 52]);
     }
 }

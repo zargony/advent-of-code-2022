@@ -37,17 +37,18 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000\n";
+    fn calories() -> Vec<Vec<u32>> {
+        const INPUT: &str = "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000\n";
+        parse(Input::from(INPUT)).unwrap()
+    }
 
     #[test]
     fn part_1() {
-        let calories = parse(Input::from(INPUT)).unwrap();
-        assert_eq!(max_calories(&calories), 24000);
+        assert_eq!(max_calories(&calories()), 24000);
     }
 
     #[test]
     fn part_2() {
-        let calories = parse(Input::from(INPUT)).unwrap();
-        assert_eq!(top_calories(&calories, 3), 45000);
+        assert_eq!(top_calories(&calories(), 3), 45000);
     }
 }

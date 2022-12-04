@@ -154,19 +154,20 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 mod tests {
     use super::*;
 
-    const INPUT: &str = "A Y\nB X\nC Z\n";
+    fn rounds() -> Vec<Round> {
+        const INPUT: &str = "A Y\nB X\nC Z\n";
+        Input::from(INPUT).lines_parse().try_collect().unwrap()
+    }
 
     #[test]
     fn part_1() {
-        let rounds: Vec<Round> = Input::from(INPUT).lines_parse().try_collect().unwrap();
-        let scores: Vec<_> = rounds.iter().map(Round::score_stupid).collect();
+        let scores: Vec<_> = rounds().iter().map(Round::score_stupid).collect();
         assert_eq!(scores, [8, 1, 6]);
     }
 
     #[test]
     fn part_2() {
-        let rounds: Vec<Round> = Input::from(INPUT).lines_parse().try_collect().unwrap();
-        let scores: Vec<_> = rounds.iter().map(Round::score_smart).collect();
+        let scores: Vec<_> = rounds().iter().map(Round::score_smart).collect();
         assert_eq!(scores, [4, 1, 7]);
     }
 }
