@@ -37,7 +37,7 @@ impl Input<File> {
     /// # Errors
     /// I/O error
     pub fn day(day: usize) -> io::Result<Self> {
-        Self::open(&format!("day{:02}", day))
+        Self::open(&format!("day{day:02}"))
     }
 
     /// Open puzzle input with the given name
